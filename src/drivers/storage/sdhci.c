@@ -202,20 +202,31 @@ static int sdhci_setup_adma(SdhciHost *host, MmcData *data)
 		buffer_data += desc_length;
 	}
 
-	if (host->dma64)
-		sdhci_writel(host, (u32) host->adma64_descs,
+	dcache_clean_invalidate_by_mva(data->dest,
+				       data->blocks * data->blocksize);
+
+	if (host->dma64) {
+		dcache_clean_invalidate_by_mva(host->adma64_descs,
+					       host->adma_desc_count *
+					       sizeof(*host->adma64_descs));
+		sdhci_writel(host, (uintptr_t) host->adma64_descs,
 			     SDHCI_ADMA_ADDRESS);
-	else
-		sdhci_writel(host, (u32) host->adma_descs,
+	} else {
+		dcache_clean_invalidate_by_mva(host->adma_descs,
+					       host->adma_desc_count *
+					       sizeof(*host->adma_descs));
+		sdhci_writel(host, (uintptr_t) host->adma_descs,
 			     SDHCI_ADMA_ADDRESS);
+	}
 
 	return 0;
 }
 
-static int sdhci_complete_adma(SdhciHost *host, MmcCommand *cmd)
+static int sdhci_complete_adma(SdhciHost *host, MmcCommand *cmd, MmcData *data)
 {
 	int retry;
 	u32 stat = 0, mask;
+	unsigned long data_len = data->blocks * data->blocksize;
 
 	mask = SDHCI_INT_RESPONSE | SDHCI_INT_ERROR;
 
@@ -246,6 +257,8 @@ static int sdhci_complete_adma(SdhciHost *host, MmcCommand *cmd)
 		sdhci_writel(host, stat, SDHCI_INT_STATUS);
 		if (retry && !(stat & SDHCI_INT_ERROR)) {
 			sdhci_cmd_done(host, cmd);
+			if (data->flags & MMC_DATA_READ)
+				dcache_invalidate_by_mva(data->dest, data_len);
 			return 0;
 		}
 	}
@@ -342,7 +355,7 @@ static int sdhci_send_command(MmcCtrlr *mmc_ctrl, MmcCommand *cmd,
 	sdhci_writew(host, SDHCI_MAKE_CMD(cmd->cmdidx, flags), SDHCI_COMMAND);
 
 	if (data && (host->host_caps & MMC_AUTO_CMD12))
-		return sdhci_complete_adma(host, cmd);
+		return sdhci_complete_adma(host, cmd, data);
 
 	start = timer_us(0);
 	do {
