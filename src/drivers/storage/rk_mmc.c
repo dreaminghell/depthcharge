@@ -91,9 +91,9 @@ DwmciHost *new_rkdwmci_host(uintptr_t ioaddr, uint32_t src_hz,
 
 	mmc = new_dwmci_host(ioaddr, src_hz, bus_width, removable,
 			     card_detect, 0);
-	if(removable)
-		mmc->set_clk = &rkclk_configure_sdmmc;
-	else
-		mmc->set_clk = &rkclk_configure_emmc;
+	//if(removable)
+	//	mmc->set_clk = &rkclk_configure_sdmmc;
+	//else
+	//	mmc->set_clk = &rkclk_configure_emmc;
 	return mmc;
 }

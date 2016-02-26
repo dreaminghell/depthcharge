@@ -50,7 +50,7 @@ static int board_setup(void)
 	RkSpi *spi1 = new_rockchip_spi(0xff1d0000);
 
 	flash_set_ops(&new_spi_flash(&spi1->ops)->ops);
-
+#if 0
 	SdhciHost *emmc = new_mem_sdhci_host((void *)0xfe330000,
 					     SDHCI_PLATFORM_NO_EMMC_HS200 |
 					     SDHCI_PLATFORM_NO_CLK_BASE,
@@ -59,6 +59,13 @@ static int board_setup(void)
 
 	list_insert_after(&emmc->mmc_ctrlr.ctrlr.list_node,
 			  &fixed_block_dev_controllers);
+#endif
+	#if 1  //use sdmmc boot 
+	DwmciHost *sd_card = new_rkdwmci_host(0xfe320000, 24000000, 4, 0, NULL);
+	list_insert_after(&sd_card->mmc.ctrlr.list_node,
+			  &fixed_block_dev_controllers);
+	#endif
+
 	return 0;
 }
 

@@ -67,6 +67,7 @@ static void dwmci_prepare_data(DwmciHost *host, MmcData *data)
 	dwmci_wait_reset(host, DWMCI_CTRL_FIFO_RESET);
 
 	data_start = cur_idmac;
+
 	dwmci_writel(host, DWMCI_DBADDR, (uintptr_t)cur_idmac);
 
 	if (data->flags == MMC_DATA_READ)
@@ -363,11 +364,12 @@ static int dwmci_update(BlockDevCtrlrOps *me)
 		if (host->cd_gpio)	//use gpio detect
 			present = gpio_get(host->cd_gpio);
 		else
-			present = !dwmci_readl(host, DWMCI_CDETECT);
+			present = 1;//!dwmci_readl(host, DWMCI_CDETECT);
 		if (present && !host->mmc.media) {
 			// A card is present and not set up yet. Get it ready.
 			if (mmc_setup_media(&host->mmc))
 				return -1;
+
 			host->mmc.media->dev.name = "removable dwmmc";
 			host->mmc.media->dev.removable = 1;
 			host->mmc.media->dev.ops.read = &block_mmc_read;
