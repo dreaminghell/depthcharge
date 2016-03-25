@@ -63,6 +63,22 @@ static int board_setup(void)
 
 	list_insert_after(&emmc->mmc_ctrlr.ctrlr.list_node,
 			  &fixed_block_dev_controllers);
+
+
+	/* USB2.0-EHCI */
+	UsbHostController *uhst0_ehci = new_usb_hc(EHCI, 0xfe380000);
+	UsbHostController *uhst1_ehci = new_usb_hc(EHCI, 0xfe3c0000);
+
+	list_insert_after(&uhst0_ehci->list_node, &usb_host_controllers);
+	list_insert_after(&uhst1_ehci->list_node, &usb_host_controllers);
+
+	/* USB2.0-OHCI */
+	UsbHostController *uhst0_ohci = new_usb_hc(OHCI, 0xfe3a0000);
+	UsbHostController *uhst1_ohci = new_usb_hc(OHCI, 0xfe3e0000);
+
+	list_insert_after(&uhst0_ohci->list_node, &usb_host_controllers);
+	list_insert_after(&uhst1_ohci->list_node, &usb_host_controllers);
+
 	return 0;
 }
 
