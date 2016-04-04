@@ -84,7 +84,7 @@
 		rw-a {
 			label = "rw-section-a";
 			/* Alignment: 4k (for updating) */
-			reg = <0x00400000 0x00160000>;
+			reg = <0x00400000 0x000e8000>;
 		};
 		rw-a-vblock {
 			label = "vblock-a";
@@ -103,46 +103,31 @@
 		rw-a-boot {
 			/* Alignment: no requirement (yet). */
 			label = "fw-main-a";
-			reg = <0x00402000 0x0014df00>;
+			reg = <0x00402000 0x000e5f00>;
 			type = "blob cbfs/rw/a-boot";
 		};
 		rw-a-firmware-id {
 			/* Alignment: no requirement. */
 			label = "rw-fwid-a";
-			reg = <0x0054ff00 0x00000100>;
+			reg = <0x004e7f00 0x00000100>;
 			read-only;
 			type = "blobstring fwid";
 		};
 
-		/* ---- Section: Rewritable shared 8 KB ---- */
-		shared-section {
-			/*
-			 * Alignment: 4k (for updating).
-			 * Anything in this range may be updated in recovery.
-			 */
-			label = "rw-shared";
-			reg = <0x00550000 0x00010000>;
-		};
-
-		shared-data {
-			label = "shared-data";
-			/*
-			 * Alignment: 4k (for random read/write).
-			 * RW firmware can put calibration data here.
-			 */
-			reg = <0x00550000 0x00010000>;
+		/* ---- Section: Rewritable VPD 32 KB ---- */
+		rw-vpd {
+			label = "rw-vpd";
+			/* Alignment: 4k (for updating) */
+			reg = <0x004e8000 0x00008000>;
 			type = "wiped";
-			wipe-value = [00];
+			wipe-value = [ff];
 		};
-
-
-		/* FMD described GPT goes here. */
 
 		/* ---- Section: Rewritable slot B ---- */
 		rw-b {
 			label = "rw-section-b";
 			/* Alignment: 4k (for updating) */
-			reg = <0x00580000 0x00160000>;
+			reg = <0x004f0000 0x000e8000>;
 		};
 		rw-b-vblock {
 			label = "vblock-b";
@@ -150,7 +135,7 @@
 			 * Alignment: 4k (for updating) and must be in start of
 			 * each RW_SECTION.
 			 */
-			reg = <0x00580000 0x00002000>;
+			reg = <0x004f0000 0x00002000>;
 			type = "keyblock cbfs/rw/b-boot";
 			keyblock = "firmware.keyblock";
 			signprivate = "firmware_data_key.vbprivk";
@@ -161,46 +146,59 @@
 		rw-b-boot {
 			label = "fw-main-b";
 			/* Alignment: no requirement (yet). */
-			reg = <0x00582000 0x0014df00>;
+			reg = <0x004f2000 0x000e5f00>;
 			type = "blob cbfs/rw/b-boot";
 		};
 		rw-b-firmware-id {
 			label = "rw-fwid-b";
 			/* Alignment: no requirement. */
-			reg = <0x006cff00 0x00000100>;
+			reg = <0x005d7f00 0x00000100>;
 			read-only;
 			type = "blobstring fwid";
-		};
-
-		/* ---- Section: Rewritable VPD 32 KB ---- */
-		rw-vpd {
-			label = "rw-vpd";
-			/* Alignment: 4k (for updating) */
-			reg = <0x006e0000 0x00008000>;
-			type = "wiped";
-			wipe-value = [ff];
 		};
 
 		/* ---- Section: Rewritable Event Log 16 KB ---- */
 		rw-elog {
 			label = "rw-elog";
 			/* Alignment: 4K (for updating) */
-			reg = <0x006e8000 0x00008000>;
+			reg = <0x005d8000 0x00008000>;
 			type = "wiped";
 			wipe-value = [ff];
 		};
 
-		/* ---- Section: Storage to simulate NVRAM 8 KB ---- */
+		/* ---- Section: Rewritable shared 8 KB ---- */
+		shared-section {
+			/*
+			 * Alignment: 4k (for updating).
+			 * Anything in this range may be updated in recovery.
+			 */
+			label = "rw-shared";
+			reg = <0x005e0000 0x00010000>;
+		};
+
+		shared-data {
+			label = "shared-data";
+			/*
+			 * Alignment: 4k (for random read/write).
+			 * RW firmware can put calibration data here.
+			 */
+			reg = <0x005e0000 0x00010000>;
+			type = "wiped";
+			wipe-value = [00];
+		};
+
+
+		/* ---- Section: Storage to simulate 64 KB of NVRAM ---- */
 		rw-nvram {
 			label = "rw-nvram";
-			reg = <0x006f0000 0x00010000>;
+			reg = <0x005f0000 0x00010000>;
 			type = "wiped";
 			wipe-value = [ff];
 		};
 
 		rw-legacy {
 			label = "rw-legacy";
-			reg = <0x00700000 0x00100000>;
+			reg = <0x00600000 0x00200000>;
 			type = "wiped";
 			wipe-value = [ff];
 		};
