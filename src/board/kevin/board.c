@@ -22,7 +22,7 @@
 
 #include <assert.h>
 #include <libpayload.h>
-#include <arm64/arch/mmu.h>
+
 #include "base/init_funcs.h"
 #include "boot/fit.h"
 #include "boot/ramoops.h"
@@ -51,13 +51,7 @@ static int board_setup(void)
 
 	// Claim that we have an power key to satisfy vboot.
 	flag_replace(FLAG_PWRSW, new_gpio_low());
-{
-	u32 size;
-	struct cb_framebuffer *fbinfo = lib_sysinfo.framebuffer;
-	size = fbinfo->bytes_per_line * fbinfo->y_resolution;
 
-	mmu_config_range((void *)fbinfo->physical_address, size, TYPE_DMA_MEM);
-}
 	RkSpi *spi1 = new_rockchip_spi(0xff1d0000);
 	flash_set_ops(&new_spi_flash(&spi1->ops)->ops);
 	SdhciHost *emmc = new_mem_sdhci_host((void *)0xfe330000,
