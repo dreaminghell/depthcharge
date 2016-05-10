@@ -35,7 +35,7 @@
 uint32_t VbExKeyboardRead(void)
 {
 	uint64_t timer_start;
-
+return ('U' & ~0x40);
 	// No input, just give up.
 	if (!havechar())
 		return 0;
